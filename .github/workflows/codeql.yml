@@ -12,12 +12,9 @@ on:
       - "**/*.js"
       - "**/*.ts"
       - "**/*.py"
-  schedule:
-    - cron: '0 0 * * 0'
   workflow_dispatch:
 jobs:
   analyze:
-    if: ${{ hashFiles('**/*.js') != '' || hashFiles('**/*.ts') != '' || hashFiles('**/*.py') != '' }}
     runs-on: ubuntu-latest
     permissions:
       security-events: write
