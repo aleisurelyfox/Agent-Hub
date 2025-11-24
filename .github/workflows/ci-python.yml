@@ -2,8 +2,17 @@ name: Python CI
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - "requirements.txt"
+      - "pyproject.toml"
+      - "**/*.py"
   pull_request:
     branches: [ "main" ]
+    paths:
+      - "requirements.txt"
+      - "pyproject.toml"
+      - "**/*.py"
+  workflow_dispatch:
 jobs:
   build:
     if: ${{ hashFiles('requirements.txt') != '' || hashFiles('pyproject.toml') != '' }}
