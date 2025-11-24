@@ -15,7 +15,6 @@ on:
   workflow_dispatch:
 jobs:
   build:
-    if: ${{ hashFiles('requirements.txt') != '' || hashFiles('pyproject.toml') != '' }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -27,17 +26,24 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install pytest
         run: pip install pytest
-      - name: Install from requirements.txt
-        if: ${{ hashFiles('requirements.txt') != '' }}
-        run: pip install -r requirements.txt
-      - name: Install project via pyproject.toml
-        if: ${{ hashFiles('pyproject.toml') != '' }}
-        run: pip install .
-      - name: Python dependency audit
-        if: ${{ hashFiles('requirements.txt') != '' || hashFiles('pyproject.toml') != '' }}
+      - name: Install from requirements.txt if present
         run: |
-          pip install pip-audit
-          pip-audit || true
-      - name: Run tests
-        if: ${{ hashFiles('requirements.txt') != '' || hashFiles('pyproject.toml') != '' }}
-        run: pytest -q || echo "No tests found"
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+      - name: Install project via pyproject.toml if present
+        run: |
+          if [ -f pyproject.toml ]; then
+            pip install .
+          fi
+      - name: Python dependency audit if deps present
+        run: |
+          if [ -f requirements.txt ] || [ -f pyproject.toml ]; then
+            pip install pip-audit
+            pip-audit || true
+          fi
+      - name: Run tests if deps present
+        run: |
+          if [ -f requirements.txt ] || [ -f pyproject.toml ]; then
+            pytest -q || echo "No tests found"
+          fi
